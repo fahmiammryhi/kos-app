@@ -1,18 +1,2 @@
 php artisan migrate
-
-copy php 8.3.27
-icuio74.dll
-icuin74.dll
-icuuc74.dll
-icudt74.dll
-to bin 
-
-php_intl.dll to ext > C:\Users\HP\.config\herd-lite\bin\
-
-isi php.ini
-
-variables_order = "GPCS"
-opcache.enable=1
-opcache.enable_cli=1
-extension_dir="C:\Users\HP\.config\herd-lite\bin\ext"
-extension=php_intl.dll
+php artisan storage:link

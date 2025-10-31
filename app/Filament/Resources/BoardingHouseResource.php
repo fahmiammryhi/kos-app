@@ -14,6 +14,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Forms\Components\Tabs;
 use Filament\Support\str;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 
 class BoardingHouseResource extends Resource
 {
@@ -45,13 +48,32 @@ class BoardingHouseResource extends Resource
                                 Forms\Components\Select::make('city_id')
                                     ->relationship('city', 'name')
                                     ->required(),
-                                 Forms\Components\Select::make('category_id')
+                                Forms\Components\Select::make('category_id')
                                     ->relationship('category', 'name')
-                                    ->required()
+                                    ->required(),
+                                Forms\Components\RichEditor::make('description')
+                                    ->required(),
+                                Forms\Components\TextInput::make('price')
+                                    ->numeric()
+                                    ->prefix('IDR')
+                                    ->required(),
+                                Forms\Components\TextArea::make('Address')
+                                    ->required(),
+                                
                          ]),
-                        Forms\Components\Tabs\Tab::make('Tab 2')
+                        Forms\Components\Tabs\Tab::make('Bonus Kos')
                             ->schema([
-                                // ...
+                                Forms\Components\Repeater::make('bonuses')
+                                ->schema([
+                                    Forms\Components\FileUpload::make('image')
+                                        ->image()
+                                        ->directory('bonuses')
+                                        ->required(),
+                                    Forms\Components\TextInput::make('name')
+                                        ->required(),
+                                    Forms\Components\TextInput::make('description')
+                                        ->required(),
+                                ])
                             ]),
                         Forms\Components\Tabs\Tab::make('Tab 3')
                             ->schema([
