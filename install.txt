@@ -1,2 +1,8 @@
-php artisan migrate
-php artisan storage:link
+php artisan serve (start server)
+php artisan migrate (Migrasi ke Database)
+php artisan storage:link (agar file upload bisa di akses di url)
+php artisan migrate:reset
+php artisan migrate:fresh --seed (reset database)
+php artisan make:filament-user (create admin)
+php artisan make:model RoomImage (create model)
+php artisan make:filament-resource Transaction (create resource)
