@@ -9,7 +9,6 @@ class CityRepository implements CityRepositoryInterface
 {
     public function getAllCities()
     {
-        // return City::all();
-        return City::withCount('boardingHouses')->get();
+        return City::all();
     }
 }

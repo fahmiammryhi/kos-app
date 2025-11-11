@@ -9,7 +9,11 @@ class CategoryRepository implements CategoryRepositoryInterface
 {
     public function getAllCategories()
     {
-        // return Category::all();
-        return Category::withCount('boardingHouses')->get();
+        return Category::all();
+    }
+
+    public function getAllCategoryBySlug($slug)
+    {
+        return Category::where('slug', $slug)->first();
     }
 }
