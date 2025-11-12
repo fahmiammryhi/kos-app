@@ -14,11 +14,11 @@
 </div>
 <div id="Header" class="relative flex items-center justify-between gap-2 px-5 mt-[18px]">
     <div class="flex flex-col gap-[6px]">
-        <h1 class="font-bold text-[32px] leading-[48px]">Kos in {{ $category->name }}</h1>
-        <p class="text-ngekos-grey">Tersedia {{ $category->boardingHouses->count() }} Kos</p>
+        <h1 class="font-bold text-[32px] leading-[48px]">{{ $city->name }} City</h1>
+        <p class="text-ngekos-grey">Tersedia {{ $city->boardingHouses->count() }} Kos</p>
     </div>
     <button class="flex flex-col items-center text-center shrink-0 rounded-[22px] p-[10px_20px] gap-2 bg-white">
-        <img src="{{ asset ('assets/images/icons/star.svg') }}" class="w-6 h-6" alt="icon">
+        <img src="{{ asset('assets/images/icons/star.svg') }}" class="w-6 h-6" alt="icon">
         <p class="font-bold text-sm">4/5</p>
     </button>
 </div>
@@ -49,5 +49,4 @@
     </a>
     @endforeach
 </section>
-<!-- @include('includes.navigation') -->
 @endsection
