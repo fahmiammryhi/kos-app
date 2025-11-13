@@ -27,14 +27,17 @@ class TransactionRepository implements TransactionRepositoryInterface
     public function saveTransaction($data)
     {
         $room = Room::find($data['room_id']);
-
         $data = $this->prepareTransactionData($data, $room);
-
         $transaction = Transaction::create($data);
 
-        // session()->forget('transaction');
+        session()->forget('transaction');
 
         return $transaction;
+    }
+
+    public function getTransactionByCode ($code)
+    {
+        return Transaction::where('code', $code)->first();
     }
 
     private function prepareTransactionData($data, $room)

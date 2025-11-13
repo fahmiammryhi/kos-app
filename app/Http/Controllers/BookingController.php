@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\BookingShowRequest;
 use App\Http\Requests\CustomerInformationStoreRequest;
 use App\Interfaces\BoardingHouseRepositoryInterface;
 use App\Interfaces\TransactionRepositoryInterface;
@@ -60,28 +61,24 @@ class BookingController extends Controller
     public function payment(Request $request)
     {
         $this->transactionRepository->saveTransactionDataToSession($request->all());
-        $transaction = $this->transactionRepository->saveTransaction($this->transactionRepository->getTransactionDataFromSession());
 
-        // dd($transaction);
+        $transaction = $this->transactionRepository->saveTransaction(
+            $this->transactionRepository->getTransactionDataFromSession()
+        );
 
-        // Set your Merchant Server Key
-        \Midtrans\Config::$serverKey = config('midtrans.serverKey');
-        // Set to Development/Sandbox Environment (default). Set to true for Production Environment (accept real transaction).
-        \Midtrans\Config::$isProduction = config('midtrans.isProduction');
-        // Set sanitization on (default)
-        \Midtrans\Config::$isSanitized = config('midtrans.isSanitized');
-        // Set 3DS transaction for credit card to true
-        \Midtrans\Config::$is3ds = config('midtrans.is3ds');
+        $serverKey = config('midtrans.serverKey');
+        $isProduction = config('midtrans.isProduction');
 
-        \Midtrans\Config::$curlOptions = [
-            CURLOPT_SSL_VERIFYHOST => 0,
-            CURLOPT_SSL_VERIFYPEER => 0,
-        ];
+        $url = $isProduction
+            ? 'https://app.midtrans.com/snap/v1/transactions'
+            : 'https://app.sandbox.midtrans.com/snap/v1/transactions';
 
         $params = [
             'transaction_details' => [
                 'order_id' => $transaction->code,
                 'gross_amount' => $transaction->total_amount,
+                // 'gross_amount' => (int) round($transaction->total_amount),
+
             ],
             'customer_details' => [
                 'first_name' => $transaction->name,
@@ -90,13 +87,55 @@ class BookingController extends Controller
             ],
         ];
 
-        $paymentUrl = \Midtrans\Snap::createTransaction($params)->redirect_url;
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($params));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Accept: application/json',
+            'Content-Type: application/json',
+            'Authorization: Basic ' . base64_encode($serverKey . ':'),
+        ]);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
 
-        return redirect($paymentUrl);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        $result = json_decode($response, true);
+
+        // Handle error response
+        if ($httpCode != 201 || !isset($result['redirect_url'])) {
+            \Log::error('Midtrans Payment Error', [
+                'http_code' => $httpCode,
+                'response' => $result,
+                'params' => $params,
+            ]);
+
+            return back()->with('error', 'Gagal membuat transaksi pembayaran. Silakan coba lagi.');
+        }
+        return redirect($result['redirect_url']);
     }
+
+    public function success(Request $request) {
+        $transaction = $this->transactionRepository->getTransactionByCode($request->order_id);
+
+        if(!$transaction){
+            return redirect()->route('home');
+        }
+
+        return view('pages.booking.success', compact('transaction'));
+    }
+
 
     public function check()
     {
-        return view('pages.check-booking');
+        return view('pages.booking.check-booking');
+    }
+
+    public function show(BookingShowRequest $request)
+    {
+
     }
 }

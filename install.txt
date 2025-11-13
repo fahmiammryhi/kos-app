@@ -7,3 +7,5 @@ php artisan make:filament-user (create admin)
 php artisan make:model RoomImage (create model)
 php artisan make:filament-resource Transaction (create resource)
 php artisan make:provider RepositoryServiceProvider (create RepositoryServiceProvider)
+ngrok http 8000 //(port)
+ php artisan install:api
