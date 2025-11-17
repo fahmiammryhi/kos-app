@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use Twilio\Rest\Client;
 
 class MidtransController extends Controller
 {
@@ -25,6 +26,26 @@ class MidtransController extends Controller
             return response()->json(['message' => 'Transaction not found'], 404);
         }
 
+        $sid    = "AC54250433965eb3faa32d9a04d396d89e";
+        $token  = "92289f375333e99e7ceb056339d5c1ca";
+
+        $httpClient = new \Twilio\Http\CurlClient([
+            CURLOPT_SSL_VERIFYHOST => 0,
+            CURLOPT_SSL_VERIFYPEER => false,
+        ]);
+
+        $twilio = new Client($sid, $token, null, null, $httpClient);
+
+        $messages =
+            "Halo, " . $transaction->name . "!" . PHP_EOL . PHP_EOL .
+            "Kami telah menerima pembayaran Anda dengan kode booking: " . $transaction->code . "." . PHP_EOL .
+            "Total pembayaran: Rp " . number_format($transaction->total_amount, 0, ',', '.') . PHP_EOL . PHP_EOL .
+            "Anda bisa datang ke kost " . $transaction->boardinghouse->name . PHP_EOL .
+            "Alamat: " . $transaction->boardinghouse->address . PHP_EOL .
+            "Mulai tanggal: " . date('d-m-Y', strtotime($transaction->start_date)) . PHP_EOL . PHP_EOL .
+            "Terima kasih atas kepercayaan Anda! 😊" . PHP_EOL .
+            "Kami tunggu kedatangan Anda.";
+
         switch ($transactionStatus) {
             case 'capture':
                 if ($request->payment_type == 'credit_card') {
@@ -38,6 +59,17 @@ class MidtransController extends Controller
 
             case 'settlement':
                 $transaction->update(['payment_status' => 'success']);
+
+                $twilio->messages
+                    ->create(
+                        // "whatsapp:+" . $transaction->phone_number, // to
+                        "whatsapp:+6282132601411",
+                        array(
+                            "from" => "whatsapp:+14155238886",
+                            "body" => "$messages"
+                        )
+                    );
+
                 break;
 
             case 'pending':

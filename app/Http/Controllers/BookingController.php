@@ -118,10 +118,11 @@ class BookingController extends Controller
         return redirect($result['redirect_url']);
     }
 
-    public function success(Request $request) {
+    public function success(Request $request)
+    {
         $transaction = $this->transactionRepository->getTransactionByCode($request->order_id);
 
-        if(!$transaction){
+        if (!$transaction) {
             return redirect()->route('home');
         }
 
@@ -134,8 +135,16 @@ class BookingController extends Controller
         return view('pages.booking.check-booking');
     }
 
-    public function show(BookingShowRequest $request)
+    public function show(BookingShowRequest $request) 
     {
+        // dd($this->transactionRepository->getTransactionByCodeEmailPhone($request->code, $request->email, $request->phone_number));
+        
+        $transaction = $this->transactionRepository->getTransactionByCodeEmailPhone($request->code, $request->email, $request->phone_number);
+        
+        if (!$transaction) {
+            return redirect()->back()->with('error', 'Data booking tidak ditemukan. Silakan periksa kembali informasi yang Anda masukkan.');
+        }
 
+        return view('pages.booking.detail', compact('transaction'));
     }
 }

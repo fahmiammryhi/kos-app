@@ -20,7 +20,7 @@ class BookingShowRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'code' => 'requrired',
+            'code' => 'required',
             'email' => 'required|email',
             'phone_number' => 'required'
         ];

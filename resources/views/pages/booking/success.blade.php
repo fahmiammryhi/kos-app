@@ -34,7 +34,7 @@
                 </div>
                 <div class="flex flex-col gap-3 w-full">
                     <p class="font-semibold text-lg leading-[27px]">{{ $transaction->room->name }}</p>
-                        <hr class="border-[#F1F2F6]">
+                    <hr class="border-[#F1F2F6]">
                     <div class="flex items-center gap-[6px]">
                         <img src="{{ asset('assets/images/icons/profile-2user.svg') }}" class="w-5 h-5 flex shrink-0"
                             alt="icon">
@@ -66,9 +66,15 @@
         <a href="{{ route('home') }}"
             class="w-full rounded-full p-[14px_20px] text-center font-bold text-white bg-ngekos-orange">Explore
             Other Kos</a>
-        <a href="booking-details.html"
-            class="w-full rounded-full p-[14px_20px] text-center font-bold text-white bg-ngekos-black">View My
-            Booking</a>
+        <form action="{{ route('check-booking.show') }}" method="POST">
+            @csrf
+            <input type="hidden" name="code" value="{{ $transaction->code }}">
+            <input type="hidden" name="email" value="{{ $transaction->email }}">
+            <input type="hidden" name="phone_number" value="{{ $transaction->phone_number }}">
+            <button class="w-full rounded-full p-[14px_20px] text-center font-bold text-white bg-ngekos-black">
+                View My Booking
+            </button>
+        </form>
     </div>
 </div>
 @endsection
